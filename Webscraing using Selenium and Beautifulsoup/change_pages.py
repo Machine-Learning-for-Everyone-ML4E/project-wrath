@@ -1,3 +1,5 @@
+# sample program to naviagte through pages using click buttons
+
 from selenium import webdriver
 import time
 

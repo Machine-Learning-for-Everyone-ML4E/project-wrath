@@ -6,6 +6,13 @@ import time
 
 
 def crawler(req, df):
+    """
+    Takes the current page url and crawls to find the prof contact details.
+    
+    params:
+        req: html document obtained from driver.page_source
+        df: dataframe to store the data in respective columns
+    """
 
     soup = BeautifulSoup(req, 'html.parser')
     # print("__________________________________________________________")
@@ -54,6 +61,7 @@ def crawler(req, df):
                             print('Email: ', email)
                         else:
                             email = None
+            
             df = df.append({'Name': name.get_text(),
                             'Designation': pname,
                             'Department': dept,
