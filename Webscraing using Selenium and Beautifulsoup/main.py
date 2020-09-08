@@ -35,21 +35,16 @@ def crawler(req, df):
             except IndexError:
                 print('\nName not found..', url)
                 continue
-        
-            print('\nName of the Prof.: ', name.get_text())
-            desg = soup_obj.find_all('p', attrs={'class': 'team-title'})
 
-            contact=  ""
-            dept=""
-            email=""
-            
+            desg = soup_obj.find_all('p', attrs={'class': 'team-title'})
+            pname = dept = contact = email = None
             for i, ele in enumerate(desg):
                 if i == 0:
                     pname = ele.get_text().strip()
-                    print('Designation: ', pname)
+
                 elif i == 1:
                     dept = ele.get_text().strip()
-                    print('Department: ', dept)
+
                 else:
 
                     if ele.find_all('i'):
@@ -57,22 +52,26 @@ def crawler(req, df):
                         if ele.find_all('i')[0]['class'][-1] == 'fa-phone':
                             contact = ele.get_text().strip().split(',')
                             contact = "/".join([x.rstrip() for x in contact])
-                            print('Contact: ', contact)
-            
-                            
                         if ele.find_all('i')[0]['class'][-1] == 'fa-envelope-o':
                             email = ele.get_text().strip()
                             email = email.replace('[at]', '@')
-                            print('Email: ', email)
-             
+
+            print('\nName of the Prof.: ', name.get_text())
+            print('Designation: ', pname)
+            print('Department: ', dept)
+            print('Contact: ', contact)
+            print('Email: ', email)
+
             df = df.append({'Name': name.get_text(),
                             'Designation': pname,
                             'Department': dept,
                             'Contact': contact,
                             'Email': email}, ignore_index=True)
 
-            print(len(df), '\n')
     return df
+
+    pass
+
 
 if __name__ == '__main__':
 
@@ -87,11 +86,13 @@ if __name__ == '__main__':
     counter = 1
 
     result = pd.DataFrame(columns=['Name', 'Designation', 'Department', 'Contact', 'Email'])
-    
+    print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
     while True and not move_ahead:
+        # print(result.head())
 
-        print(result.head())
-        result= crawler(driver.page_source, result)
+        result = crawler(driver.page_source, result)
+
+        print('\nNumbers of Details scrapped: ', len(result))
 
         time.sleep(5)
         print('Moving into the {}th page...'.format(counter + 1))
@@ -99,7 +100,7 @@ if __name__ == '__main__':
         counter += 1
         search = driver.find_element_by_id('ContentPlaceHolder1_PageContent_btnnext')
         move_ahead = search.get_attribute('disabled')
-    
+
         '''
         for i in mini_source[:1]:
             print('--------------------------------------------')
@@ -121,6 +122,7 @@ if __name__ == '__main__':
                         ))+1
             worksheet.set_column(idx,idx,max_len)
     writer.save()
+    print("Saved to file faculty.xlsx")
     
     time.sleep(15)
     print('\nQuitting the Driver...')
