@@ -105,13 +105,27 @@ if __name__ == '__main__':
         for i in mini_source[:1]:
             print('--------------------------------------------')
             print(i.find_all('div', attrs={'class': 'team-body'}))'''
+    
+    result = crawler(driver.page_source, result)
 
-    crawler(driver.page_source, result)
+    # write to spreadsheet
+    writer = pd.ExcelWriter('./faculty.xlsx',engine = 'xlsxwriter')
+    
+    result.to_excel(writer,sheet_name = "faculty",index=False)
+    worksheet = writer.sheets["faculty"]
 
+    for idx, column in enumerate(result):
+            series = result[column]
+            max_len = max((
+                        series.astype(str).map(len).max(),
+                        len(str(series.name))
+                        ))+1
+            worksheet.set_column(idx,idx,max_len)
+    writer.save()
+    print("Saved to file faculty.xlsx")
+    
     time.sleep(15)
     print('\nQuitting the Driver...')
     driver.quit()
 
-    print(f'Saving {len(result)} Records at...')
-    result.to_csv('Professors_Details.csv', index=False)
     pass
